@@ -1,5 +1,11 @@
+
+
 import 'package:flutter/material.dart';
+
 import 'package:video_player/video_player.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+
 
 void main() {
   runApp(MyApp());
@@ -9,42 +15,73 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MainScreen(),
+      // scaffoldMessengerKey: _scaffoldKey,
     );
   }
 }
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+
+  bool isDrawerOpen = false;
+
+  void toggleDrawer() {
+    setState(() {
+      isDrawerOpen = !isDrawerOpen;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+
       appBar: AppBar(
-        title: Text('IPTV App'),
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: Icon(Icons.menu),
+        title: Text(
+          'IPTV App',
+          style: GoogleFonts.poppins(
+            textStyle: TextStyle(color: Colors.blue, letterSpacing: .5),
+          ),
+        ),
+        leading:  Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(Icons.menu), // Icon for the button
               onPressed: () {
-                Scaffold.of(context).openDrawer();
+                Scaffold.of(context).openEndDrawer(); // Opens the end drawer
               },
-            ),
-          ),
+            );
+          },
+        ),
+        actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Handle notification icon tap
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(Icons.account_circle,color: Color(0xff004AAD),size: 50,),
             onPressed: () {
               // Handle profile icon tap
             },
           ),
         ],
       ),
-      drawer: SideMenu(),
-      body: IPTVScreen(),
+      endDrawer: SideMenu(),
+      body: Stack(
+        children: [
+          IPTVScreen(),
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 300),
+            right: isDrawerOpen ? screenWidth / 2-120  : screenWidth, // Adjust 120 based on your drawer's width
+            top: 0,
+            bottom: 0,
+            child: SideMenu(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -72,7 +109,7 @@ class IPTVScreen extends StatelessWidget {
                   ),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: 15,
+                      itemCount: 5,
                       itemBuilder: (context, index) {
                         return ListTile(
                           title: Text('Channel ${index + 1}'),
@@ -101,72 +138,83 @@ class SideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        children: [
-          DrawerHeader(
-            child: Image.network(
-              'https://testing.macvision.global/assets/img/mahincha.com-logo.png',
-              fit: BoxFit.contain,
-            ),
+
+      backgroundColor: Colors.transparent,
+      child: SafeArea(
+        bottom: true,top: true,minimum: EdgeInsets.all(20),
+        child: Container(
+          decoration:  BoxDecoration(
+            color: Colors.blueGrey.shade400,  // Set the color of the Drawer
+            borderRadius:  BorderRadius.circular(60),
           ),
-          ListTile(
-            title: Text('About'),
-            onTap: () {
-              // Show about text
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('About'),
-                    content: Text('This is an IPTV application.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Close'),
-                      ),
-                    ],
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: Image.network(
+                  'https://testing.macvision.global/assets/img/mahincha.com-logo.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              ListTile(
+                title: Text('About'),
+                onTap: () {
+                  // Show about text
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('About'),
+                        content: Text('This is an IPTV application.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Services'),
-            onTap: () {
-              // Navigate to services screen
-            },
-          ),
-          ListTile(
-            title: Text('Info'),
-            onTap: () {
-              // Show info text
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Info'),
-                    content: Text('This is some information about the app.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Close'),
-                      ),
-                    ],
+              ),
+              ListTile(
+                title: Text('Services'),
+                onTap: () {
+                  // Navigate to services screen
+                },
+              ),
+              ListTile(
+                title: Text('Info'),
+                onTap: () {
+                  // Show info text
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Info'),
+                        content: Text('This is some information about the app.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
-              );
-            },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
-
+//-----------------------------------------------------------------------------------------------------
 class ChannelCarousel extends StatefulWidget {
   @override
   _ChannelCarouselState createState() => _ChannelCarouselState();
@@ -194,7 +242,7 @@ class _ChannelCarouselState extends State<ChannelCarousel> {
 
   void _startAutoSlide() {
     Future.delayed(Duration(seconds: 3), () {
-      if (_currentPage < 9) {
+      if (_currentPage < 4) {
         _currentPage++;
       } else {
         _currentPage = 0;
@@ -210,32 +258,42 @@ class _ChannelCarouselState extends State<ChannelCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            // Play video from URL
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => VideoPlayerScreen('https://abplivetv.akamaized.net/hls/live/2043013/ganga/master.m3u8'),
-              ),
-            );
-          },
-          child: ChannelCard(index + 1),
-        );
-      },
-      onPageChanged: (int page) {
-        setState(() {
-          _currentPage = page;
-        });
-      },
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.transparent,
+      height: 400,
+      width: 100,
+      child: PageView.builder(
+
+        controller: _pageController,
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              // Play video from URL
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VideoPlayerScreen('https://iptv-org.github.io/iptv/languages/mal.m3u'),
+                ),
+              );
+            },
+            child:Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ChannelCard(index + 1),
+                ),
+          );
+        },
+        onPageChanged: (int page) {
+          setState(() {
+            _currentPage = page;
+          });
+        },
+      ),
     );
   }
 }
-
+//-----------------------------------------------------------------------------------------------
 class ChannelCard extends StatelessWidget {
   final int channelNumber;
 
@@ -244,13 +302,15 @@ class ChannelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.blueGrey.shade200,
+      elevation: 10,
       child: Center(
-        child: Text('Test $channelNumber'),
+        child: Text('Channel $channelNumber'),
       ),
     );
   }
 }
-
+//-------------------------------------------------------------------------------------------------
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
 
@@ -267,9 +327,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      widget.videoUrl,
-    );
+    _controller = VideoPlayerController.networkUrl(Uri.parse(
+      widget.videoUrl,));
     _initializeVideoPlayerFuture = _controller.initialize().then((_) {
       setState(() {});
     });
